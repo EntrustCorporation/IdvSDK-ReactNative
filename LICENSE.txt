@@ -1,0 +1,24 @@
+© 2026 Entrust Corporation. All rights reserved.
+
+Please see the terms of your Onfido (now part of Entrust) Services Agreement
+(https://www.entrust.com/legal-compliance/terms-conditions/idv/services-agreement),
+which you are bound by with respect to your use of the Entrust IDV SDK.
+
+To the extent the SDK includes copies or substantial portions of software licensed
+under third-party terms and conditions, this will be set out in
+https://documentation.identity.entrust.com/sdk/sdk-licenses.
+
+In the event of any inconsistency between the Services Agreement and any
+third-party terms and conditions, the third-party terms and conditions shall
+take precedence over the rights and restrictions granted in the Services
+Agreement, solely in respect of such third-party dependencies.
+
+The Entrust IDV SDK for React Native is built around the Entrust IDV SDK for iOS
+and the Entrust IDV SDK for Android.
+
+While the SDK for React Native does not incorporate any third-party dependencies
+beyond the React Native library, please refer to the iOS and Android license
+folders for more information about their respective dependencies:
+
+- iOS: https://github.com/EntrustCorporation/IdvSDK-iOS/tree/main/licenses
+- Android: https://github.com/EntrustCorporation/IdvSDK-Android/tree/main/licenses
