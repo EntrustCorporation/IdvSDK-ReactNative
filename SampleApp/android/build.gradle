@@ -23,8 +23,5 @@ apply plugin: "com.facebook.react.rootproject"
 allprojects {
   it.repositories {
     mavenLocal()
-    maven {
-      url "https://nexus.mgmt.onfido.xyz/repository/maven-releases/"
-    }
   }
 }

@@ -28,20 +28,21 @@ jobs:
   create-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history for proper release notes
+          fetch-depth: 0  # Fetch all history for proper release notes/changelog generation
 
-      - name: Extract version from tag or input
+      - name: Extract version
         id: version
+        env:
+          INPUT_VERSION_ARG: ${{ github.event.inputs.version }}
         run: |
-          if [ -n "${{ github.event.inputs.version }}" ]; then
+          if [ -n "$INPUT_VERSION_ARG" ]; then
             # Manual trigger - use input version
-            INPUT_VERSION="${{ github.event.inputs.version }}"
-            # Ensure version starts with 'v'
+            INPUT_VERSION="$INPUT_VERSION_ARG"
+            # Ensure version starts with 'v' for the tag, but keep raw version clean
             if [[ "$INPUT_VERSION" == v* ]]; then
               TAG_NAME="$INPUT_VERSION"
               VERSION="${INPUT_VERSION#v}"
@@ -49,34 +50,37 @@ jobs:
               TAG_NAME="v$INPUT_VERSION"
               VERSION="$INPUT_VERSION"
             fi
-            echo "Manual trigger with version: $VERSION"
+            echo "Manual trigger detected."
           else
             # Tag push - extract from ref
             TAG_NAME=${GITHUB_REF#refs/tags/}
             VERSION=${TAG_NAME#v}
-            echo "Tag push detected: $TAG_NAME"
+            echo "Tag push detected."
           fi
+          
           echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Tag: $TAG_NAME"
-          echo "Version: $VERSION"
+          echo "Selected Tag: $TAG_NAME"
+          echo "Selected Version: $VERSION"
 
       - name: Check if pre-release
         id: prerelease
+        env:
+          INPUT_PRERELEASE: ${{ github.event.inputs.prerelease }}
         run: |
           # Check if manually triggered with prerelease flag
-          if [ -n "${{ github.event.inputs.prerelease }}" ]; then
-            echo "is_prerelease=${{ github.event.inputs.prerelease }}" >> $GITHUB_OUTPUT
-            echo "Manual prerelease flag: ${{ github.event.inputs.prerelease }}"
+          if [ "$INPUT_PRERELEASE" == "true" ]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+            echo "Manual prerelease flag set."
           else
-            # Auto-detect from version string
+            # Auto-detect from version string (works for both manual and auto triggers)
             VERSION="${{ steps.version.outputs.version }}"
             if [[ "$VERSION" =~ -(alpha|beta|rc|dev) ]]; then
               echo "is_prerelease=true" >> $GITHUB_OUTPUT
-              echo "Auto-detected pre-release: $VERSION"
+              echo "Auto-detected pre-release from version string."
             else
               echo "is_prerelease=false" >> $GITHUB_OUTPUT
-              echo "Auto-detected stable release: $VERSION"
+              echo "Auto-detected stable release."
             fi
           fi
 
@@ -85,28 +89,25 @@ jobs:
         run: |
           TAG_NAME="${{ steps.version.outputs.tag }}"
           VERSION="${{ steps.version.outputs.version }}"
-          
-          # Get the previous tag
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 "$TAG_NAME^" 2>/dev/null || echo "")
-          
-          # Create release notes
+
+          # Create release notes file
           cat > release_notes.md << EOF
           ## 🚀 Release $VERSION
-          
+
           ### 📦 Installation
-          
+
           \`\`\`bash
           npm install @entrust.corporation/idvsdk-reactnative@$VERSION
           \`\`\`
-          
+
           or
-          
+
           \`\`\`bash
           yarn add @entrust.corporation/idvsdk-reactnative@$VERSION
           \`\`\`
-          
           EOF
           
+          # Output for debugging
           cat release_notes.md
 
       - name: Create Release
@@ -117,7 +118,9 @@ jobs:
           body_path: release_notes.md
           prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
           draft: ${{ github.event.inputs.draft || 'false' }}
-          generate_release_notes: true  # Auto-generate from PRs and commits
+          generate_release_notes: true
+          # Make sure to create the tag if it doesn't exist (useful for manual triggers)
+          target_commitish: ${{ github.sha }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

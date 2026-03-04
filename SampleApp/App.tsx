@@ -4,36 +4,31 @@ import {
   SafeAreaView,
   StatusBar,
   StyleSheet,
-  useColorScheme,
   View,
 } from 'react-native';
 import {EntrustIdv} from '@entrust.corporation/idvsdk-reactnative';
 import type {Callbacks} from '@entrust.corporation/idvsdk-reactnative/callbacks/callbacks';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {
-  Welcome,
-  FacePhoto,
-  FaceMotion,
-  type ClassicParameters,
-  type Configuration,
+  Configuration,
+  StudioParameters,
+  ClassicParameters,
+} from '@entrust.corporation/idvsdk-reactnative/SdkParameters';
+import {Document} from '@entrust.corporation/idvsdk-reactnative/steps/Document';
+import {FaceMotion} from '@entrust.corporation/idvsdk-reactnative/steps/Face';
+import {Welcome} from '@entrust.corporation/idvsdk-reactnative/steps/Welcome';
+import {
   Theme,
-  MediaResult,
-} from '@entrust.corporation/idvsdk-reactnative/src/capture-api';
-import {ThemeMode} from "@entrust.corporation/idvsdk-reactnative/src/capture-api/theming/Theme.ts";
-import {ColorTokensKeys} from "@entrust.corporation/idvsdk-reactnative/src/capture-api/theming/ColorTokens.ts";
+  ThemeMode,
+} from '@entrust.corporation/idvsdk-reactnative/theming/Theme';
 
-// Create a SDK token for this applicant in your backend and use it here
-const SDK_TOKEN = 'YOUR_SDK_TOKEN';
+// For Studio flows, use the SDK token generated during the workflow creation process and use it here
+// The workflow run ID is no longer required when Studio-type SDK tokens are used as it is embedded in the Studio token
+const studioToken = '<Your Studio token>';
 
-// For Studio flows, create a Studio-type SDK token for this applicant instead (in your backend)
-// Workflow Run ID is required for Studio-type SDK tokens and it's embedded in the studio token
-// const STUDIO_TOKEN = 'YOUR_STUDIO_TOKEN';
-
-const classicSteps = [
-  Welcome(),
-  FacePhoto({showIntro: false}),
-  FaceMotion({showIntro: false}),
-];
+// For 'classic' sessions that are yet to migrate to Workflow Studio, create a SDK token for this applicant
+// in your backend and use it here
+const sdkToken = '<Your SDK token>';
 
 // Language keys: https://sdk.onfido.com/capture/i18n/index.json
 // Custom translations for a module name and a language: https://sdk.onfido.com/capture/i18n/welcome/en_US.min.json
@@ -51,36 +46,47 @@ const customTranslations = {
 
 const customTheme: Theme = {
   mode: ThemeMode.Light,
+  branding: {
+    text: 'Brand Name',
+    logo: 'https://commons.wikimedia.org/wiki/File:React-icon.svg', // URL to a publicly accessible SVG image
+  },
   lightColors: {
-    backgroundColorOverlay: '#10598A85', // pass RGBA HEX colors, we internally convert to ARGB
+    backgroundColorOverlay: '#10598A85',
   },
   darkColors: {
-    backgroundColorOverlay: '#10598A85', // pass RGBA HEX colors, we internally convert to ARGB
+    backgroundColorOverlay: '#10598A85',
   },
 };
 
 const configuration: Configuration = {
-  disableAnalytics: false,
   theme: customTheme,
   localisation: customTranslations,
 };
 
+const studioFlowParameters: StudioParameters = {
+  sdkToken: studioToken,
+  configuration: configuration,
+};
+
+// 'Classic' flow example (unused)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const classicFlowParameters: ClassicParameters = {
-  sdkToken: SDK_TOKEN,
-  steps: classicSteps,
+  sdkToken: sdkToken,
+  steps: [Welcome(), Document(), FaceMotion()],
   configuration: configuration,
 };
 
 export default function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-
   const handleLaunchSDK = () => {
     const callbacks: Callbacks = {
-      onComplete: (result) => {
-        console.log('The onComplete callback has been called. Received:', result);
+      onComplete: result => {
+        console.log(
+          'The onComplete callback has been called. Received:',
+          result,
+        );
         // Finish or navigate away
       },
-      onError: (error) => {
+      onError: error => {
         console.error('The onError callback has been called with:', error);
         Alert.alert('An error occurred', error.message, [
           {
@@ -91,36 +97,22 @@ export default function App() {
           },
         ]);
       },
-      onUserExit: (userAction) => {
-        console.log('The onUserExit has been called with userAction:', userAction);
+      onUserExit: userAction => {
+        console.log(
+          'The onUserExit has been called with userAction:',
+          userAction,
+        );
         // Finish or navigate away
-      },
-      onAnalytics: (event) => {
-        console.log('The onAnalytics callback has been called with:', event);
-      },
-      onMedia: (media: MediaResult) => {
-        console.log('The onMedia callback has been called with:', media);
-      },
-      biometricsTokenHandler: {
-        onTokenGenerated: (customerUserHash, _encryptedBiometricToken) => {
-          // Store the token securely (e.g., AsyncStorage, SecureStore)
-          console.log('Token generated for:', customerUserHash);
-        },
-        onTokenRequested: (customerHash) => {
-          // Retrieve the token from secure storage
-          console.log('Token requested for:', customerHash);
-          return ''; // Return the stored token or empty string
-        },
       },
     };
 
     const idv = new EntrustIdv(callbacks);
-    idv.start(classicFlowParameters); // For studio flows, use studioFlowParameters instead
+    idv.start(studioFlowParameters);
   };
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <StatusBar />
       <SafeAreaView style={styles.container}>
         <View style={styles.content}>
           <Button title="Launch SDK" onPress={handleLaunchSDK} />

@@ -10,7 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@entrust.corporation/idvsdk-reactnative": "100.0.0",
+    "@entrust.corporation/idvsdk-reactnative": "100.1.0",
     "react": "19.0.0",
     "react-native": "0.79.2",
     "react-native-safe-area-context": "^5.6.1",
