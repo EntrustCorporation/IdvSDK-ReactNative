@@ -84,42 +84,41 @@ jobs:
             fi
           fi
 
-      - name: Generate release notes
+      - name: Extract version changelog
         id: release_notes
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          TAG_NAME="${{ steps.version.outputs.tag }}"
-          VERSION="${{ steps.version.outputs.version }}"
-
-          # Create release notes file
-          cat > release_notes.md << EOF
-          ## 🚀 Release $VERSION
-
-          ### 📦 Installation
-
-          \`\`\`bash
-          npm install @entrust.corporation/idvsdk-reactnative@$VERSION
-          \`\`\`
-
-          or
-
-          \`\`\`bash
-          yarn add @entrust.corporation/idvsdk-reactnative@$VERSION
-          \`\`\`
-          EOF
-          
-          # Output for debugging
-          cat release_notes.md
+          python3 << 'PYEOF'
+          import re, os, sys
+          version = os.environ['VERSION']
+          try:
+              with open('CHANGELOG.md', 'r') as f:
+                  content = f.read()
+              # Match "## {version}" section up to next "## " heading or EOF
+              pattern = rf'^## {re.escape(version)}\n(.*?)(?=^## |\Z)'
+              m = re.search(pattern, content, re.MULTILINE | re.DOTALL)
+              if m:
+                  section = f'## {version}\n' + m.group(1).rstrip()
+                  with open('version_changelog.md', 'w') as f:
+                      f.write(section)
+                  print(f'Extracted changelog section for version {version}')
+              else:
+                  print(f'Warning: No section found for {version} in CHANGELOG.md', file=sys.stderr)
+                  open('version_changelog.md', 'w').close()
+          except FileNotFoundError:
+              print('Warning: CHANGELOG.md not found', file=sys.stderr)
+              open('version_changelog.md', 'w').close()
+          PYEOF
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: Release ${{ steps.version.outputs.version }}
-          body_path: release_notes.md
+          body_path: version_changelog.md
           prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
           draft: ${{ github.event.inputs.draft || 'false' }}
-          generate_release_notes: true
-          # Make sure to create the tag if it doesn't exist (useful for manual triggers)
           target_commitish: ${{ github.sha }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
