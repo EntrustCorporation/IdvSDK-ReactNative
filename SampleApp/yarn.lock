@@ -1442,15 +1442,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@entrust.corporation/idvsdk-reactnative@npm:100.5.0":
-  version: 100.5.0
-  resolution: "@entrust.corporation/idvsdk-reactnative@npm:100.5.0"
+"@entrust.corporation/idvsdk-reactnative@npm:100.6.0":
+  version: 100.6.0
+  resolution: "@entrust.corporation/idvsdk-reactnative@npm:100.6.0"
   peerDependencies:
     react: "*"
     react-native: "*"
   bin:
     register-native-modules: bin/register-native-modules.ts
-  checksum: 9b25dce5ee895fd2b3b3cf101247ee41862ed0965d7f36fdd47acc4ec23f38c4811279bce6f6eba3267bd0fdcca2321be610bc68d8b5d004faa084cc5d84b38e
+  checksum: 346c93df97cd53b9e7459e3827057b4ba390584364724fc0cc6934ea7d7e15ffe9227a5c756d56eeea70ec3ce4cc5f803186dd70b1bc846aa5c3b7b41b62d8aa
   languageName: node
   linkType: hard
 
@@ -2774,7 +2774,7 @@ __metadata:
     "@babel/core": ^7.25.2
     "@babel/preset-env": ^7.25.3
     "@babel/runtime": ^7.25.0
-    "@entrust.corporation/idvsdk-reactnative": 100.5.0
+    "@entrust.corporation/idvsdk-reactnative": 100.6.0
     "@react-native-community/cli": 18.0.0
     "@react-native-community/cli-platform-android": 18.0.0
     "@react-native-community/cli-platform-ios": 18.0.0
