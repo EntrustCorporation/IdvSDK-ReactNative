@@ -1,3 +1,10 @@
+## 100.8.1
+
+### Changed
+
+- Update iOS SDK to 100.12.1
+- Native module package READMEs now state the install command including peer dependencies, and link to the SDK Integration guide
+
 ## 100.8.0
 
 ### Added
