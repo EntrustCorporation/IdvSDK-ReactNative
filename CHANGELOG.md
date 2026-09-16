@@ -1,3 +1,10 @@
+## 100.9.0
+
+### Changed
+
+- Update Android SDK to 100.15.0
+- Update iOS SDK to 100.14.0
+
 ## 100.8.1
 
 ### Changed
