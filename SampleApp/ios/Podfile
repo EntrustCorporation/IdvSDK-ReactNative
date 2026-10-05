@@ -31,5 +31,19 @@ target 'SampleApp' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # fmt 11.0.2, pinned by React Native 0.79, fails to compile under the Clang
+    # shipped with Xcode 26. fmt has no FMT_USE_CONSTEVAL override, so the
+    # detection chain has to be forced down its disabled branch in the header.
+    fmt_base = File.join(installer.sandbox.root, 'fmt', 'include', 'fmt', 'base.h')
+    if File.exist?(fmt_base)
+      source = File.read(fmt_base)
+      needle = "#if !defined(__cpp_lib_is_constant_evaluated)\n#  define FMT_USE_CONSTEVAL 0"
+      if source.include?(needle)
+        File.chmod(0644, fmt_base)
+        File.write(fmt_base, source.sub(needle, "#if 1 // patched: force FMT_USE_CONSTEVAL 0\n#  define FMT_USE_CONSTEVAL 0"))
+        Pod::UI.puts 'Patched fmt/base.h to disable consteval'.yellow
+      end
+    end
   end
 end

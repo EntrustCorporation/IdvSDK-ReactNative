@@ -1,3 +1,12 @@
+## 100.10.0
+
+### Changed
+
+- Update Android SDK to 100.16.0
+- Update iOS SDK to 100.16.0
+- Added iOS support to Consent native module wrapper package
+- Created new Retry native module wrapper package with iOS and Android support
+
 ## 100.9.0
 
 ### Changed
