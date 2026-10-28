@@ -1,3 +1,14 @@
+## 100.12.0
+
+### Changed
+
+- Update Android SDK to 100.17.0
+- Update iOS SDK to 100.18.0
+
+### Fixed
+
+- Fixed the Retry module not being linked on Android
+
 ## 100.10.0
 
 ### Changed
