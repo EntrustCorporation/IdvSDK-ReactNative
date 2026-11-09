@@ -8,3 +8,6 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
+
+# R8 strips this class, but React Native looks it up at startup (SDK-9814)
+-keep class com.facebook.react.devsupport.CxxInspectorPackagerConnection** { *; }

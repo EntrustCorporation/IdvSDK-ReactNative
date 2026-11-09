@@ -1,3 +1,11 @@
+## 100.13.0
+
+### Changed
+
+- On iOS, the NFC package now depends on the `OpenSSL-Universal` pod
+- Update Android SDK to 100.18.0
+- Update iOS SDK to 100.19.0
+
 ## 100.12.0
 
 ### Changed
