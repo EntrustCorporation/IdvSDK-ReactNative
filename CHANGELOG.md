@@ -1,3 +1,19 @@
+## 100.14.0
+
+### Added
+
+- Added support for Certificate Pinning
+
+### Changed
+
+- Update Android SDK to 100.19.0
+- Update iOS SDK to 100.20.0
+- `onMedia` now hands over `mediaFile.fileData` as the base64 string Android and iOS send, matching the Capture API contract, instead of decoding it to `number[]`. This removes a decode of every captured file on the JavaScript thread. A new `base64ToBytes` export decodes it when you need the raw bytes.
+
+### Fixed
+
+- iOS: onComplete results are now serialised in the same shape as Android (sides as an array of {type, id, videoId}); Proof of Address results are returned
+
 ## 100.13.0
 
 ### Changed
